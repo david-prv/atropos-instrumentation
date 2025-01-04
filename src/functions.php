@@ -1,7 +1,4 @@
 <?php
-
-use App\Visitor\WordPressSinkVisitor;
-
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;

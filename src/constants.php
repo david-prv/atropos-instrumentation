@@ -1,17 +1,4 @@
 <?php
-require(__DIR__ . "/../vendor/autoload.php");
-require(__DIR__ . "/functions.php");
-
-ini_set('xdebug.max_nesting_level', 3000);
-ini_set('error_reporting', E_ALL);
-ini_set('memory_limit', -1);
-set_time_limit(0);
-
-assert(
-    count($argv) >= 2,
-    "Usage: php src/instrumentor.php <target> [<excluded>]"
-);
-
 /**
  * The location of the WordPress instance.
  */

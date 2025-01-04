@@ -78,7 +78,7 @@ class NewSinkVisitor extends AbstractSinkVisitor
 }
 ```
 
-Don't forget to instruct the instrumentor to use the newly created visitor class in `src/bootstrap.php`:
+Don't forget to instruct the instrumentor to use the newly created visitor class in `src/constants.php`:
 
 ```php
 /**
