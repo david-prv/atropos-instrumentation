@@ -45,3 +45,11 @@ if (!defined("BUG_ORACLE_ENABLED_LOCATION")) {
 if (!defined("BUG_TRIGGERED_LOCATION")) {
     define("BUG_TRIGGERED_LOCATION", "/tmp/bug_triggered");
 }
+
+/**
+ * The sink visitor used for instrumentation. Adjust this variable
+ * if you want to instrument a different target application.
+ */
+if (!defined("SINK_VISITOR_CLASS")) {
+    define("SINK_VISITOR_CLASS", \App\Visitor\WordPressSinkVisitor::class);
+}

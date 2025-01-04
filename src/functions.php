@@ -35,13 +35,14 @@ if (!function_exists("__instrument_ast")) {
      * Instruments an AST with feedback mechanism.
      *
      * @param array $ast The AST to instrument.
+     * @param string $visitor The AST visitor to use.
      * @param string $sourceFile The location of the source file.
      * @return array The instrumented AST as array.
      */
-    function __instrument_ast(array $ast, string $sourceFile): array
+    function __instrument_ast(array $ast, string $visitor, string $sourceFile): array
     {
         $traverser = new NodeTraverser();
-        $traverser->addVisitor(new WordPressSinkVisitor($sourceFile));
+        $traverser->addVisitor(new $visitor($sourceFile));
         return $traverser->traverse($ast);
     }
 }

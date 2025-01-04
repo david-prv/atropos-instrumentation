@@ -59,7 +59,7 @@ foreach ($sourceFiles as $sourceFile) {
     assert($ast !== []);
 
     // instrument AST iff relevant
-    $instrumented = __instrument_ast($ast, $sourceFile);
+    $instrumented = __instrument_ast($ast, SINK_VISITOR_CLASS, $sourceFile);
     assert($instrumented !== []);
 
     // transform instrumented AST back to source code
