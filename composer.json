@@ -1,0 +1,11 @@
+{
+    "autoload": {
+        "classmap": [
+            "src",
+            "vendor"
+        ]
+    },
+    "require": {
+        "nikic/php-parser": "^5.4"
+    }
+}
