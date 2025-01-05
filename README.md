@@ -82,11 +82,11 @@ Don't forget to instruct the instrumentor to use the newly created visitor class
 
 ```php
 /**
- * The sink visitor used for instrumentation. Adjust this variable
+ * The sink visitor used for target instrumentation. Adjust this variable
  * if you want to instrument a different target application.
  */
-if (!defined("SINK_VISITOR_CLASS")) {
-    define("SINK_VISITOR_CLASS", \App\Visitor\WordPressSinkVisitor::class);
+if (!defined("TARGET_VISITOR_CLASS")) {
+    define("TARGET_VISITOR_CLASS", \App\Visitor\WordPressSinkVisitor::class);
 }
 ```
 
