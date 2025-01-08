@@ -27,6 +27,17 @@ class WordPressSinkVisitor extends AbstractSinkVisitor
             ["get_users", "/wp-includes/user.php"],
             ["update_user_meta", "/wp-includes/user.php"],
             ["query", "/wp-includes/class-wpdb.php"],
+            ["get_var", "/wp-includes/class-wpdb.php"],
+            ["get_row", "/wp-includes/class-wpdb.php"],
+            ["get_col", "/wp-includes/class-wpdb.php"],
+            ["get_results", "/wp-includes/class-wpdb.php"],
+            ["replace", "/wp-includes/class-wpdb.php"],
+            ["esc_like", "/wp-includes/class-wpdb.php"],
+            ["like_escape", "/wp-includes/deprecated.php"],
+            ["esc_sql", "/wp-includes/formatting.php"],
+            ["escape", "/wp-includes/class-wp-xmlrpc-server.php"],
+            ["wp_redirect", "/wp-includes/pluggable.php"],
+            ["do_action", "/wp-includes/plugin.php"],
             ["install", "/includes/class-plugin-upgrader.php"]
         ];
 
