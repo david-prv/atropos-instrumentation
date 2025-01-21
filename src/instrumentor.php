@@ -5,7 +5,7 @@ require(__DIR__ . "/../vendor/autoload.php");
 require(__DIR__ . "/constants.php");
 require(__DIR__ . "/functions.php");
 
-require(__DIR__ . "/cache/utils/test.php");
+require(__DIR__ . "/fuzzcache/wrapper.php");
 
 ini_set('xdebug.max_nesting_level', 3000);
 ini_set('error_reporting', E_ALL);
