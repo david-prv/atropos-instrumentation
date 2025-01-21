@@ -226,7 +226,7 @@ function {$functionName}({$functionParams}) {
     {$functionBody}
 }
 EOT;
-            // iff it is a relevant sink, replace it with instrument.
+            // iff it is a relevant sink, replace it with instrumented version.
             return __parse_ast_from_code($payload)[0];
         }
 

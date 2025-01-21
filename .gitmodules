@@ -1,4 +1,0 @@
-[submodule "src/cache"]
-	path = src/cache
-	url = https://github.com/secureweb/fuzzcache
-	ignore = dirty

@@ -38,3 +38,11 @@ if (!defined("BUG_ORACLE_ENABLED_LOCATION")) {
 if (!defined("BUG_TRIGGERED_LOCATION")) {
     define("BUG_TRIGGERED_LOCATION", "/tmp/bug_triggered");
 }
+
+/**
+ * Toggles the use of "FuzzCache" to improve the performance
+ * of the target application, as e.g. WordPress.
+ */
+if (!defined("OPTIMIZE_WITH_FUZZ_CACHE")) {
+    define("OPTIMIZE_WITH_FUZZ_CACHE", false);
+}
