@@ -2,6 +2,12 @@
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
+use PhpParser\Error;
+use PhpParser\Node;
+use PhpParser\Node\Stmt;
+use PhpParser\PrettyPrinter;
+
+use App\Visitor\ModifyWhileLoopVisitor;
 
 if (!function_exists("__parse_ast_from_code")) {
     /**
@@ -20,7 +26,7 @@ if (!function_exists("__parse_ast_from_code")) {
         try {
             $ast = $parser->parse($code);
         } catch (Error $error) {
-            echo "Parse error: {$error->getMessage()}\n";
+            echo "[!] Parse Error: " . $error->getMessage() . PHP_EOL;
             return [];
         }
         return $ast;
@@ -40,6 +46,11 @@ if (!function_exists("__instrument_ast")) {
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new $visitor($sourceFile));
+
+        if (OPTIMIZE_WITH_FUZZ_CACHE) {
+            $traverser->addVisitor(new ModifyWhileLoopVisitor());
+        }
+
         return $traverser->traverse($ast);
     }
 }
@@ -74,3 +85,4 @@ if (!function_exists("__adjust_path_separators")) {
         return str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $path);
     }
 }
+

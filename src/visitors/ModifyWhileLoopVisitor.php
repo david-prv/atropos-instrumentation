@@ -1,11 +1,15 @@
 <?php
+
+namespace App\Visitor;
+
 use PhpParser\Error;
 use PhpParser\Node;
 use PhpParser\Node\Stmt;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter;
+use PhpParser\NodeVisitorAbstract;
 
-class ModifyWhileLoopVisitor extends PhpParser\NodeVisitorAbstract
+class ModifyWhileLoopVisitor extends NodeVisitorAbstract
 {
     private $replacementFunctionName = 'PHPSHMCache\sqlWrapperFunc';
 

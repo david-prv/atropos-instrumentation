@@ -5,8 +5,6 @@ require(__DIR__ . "/../vendor/autoload.php");
 require(__DIR__ . "/constants.php");
 require(__DIR__ . "/functions.php");
 
-require(__DIR__ . "/fuzzcache/wrapper.php");
-
 ini_set('xdebug.max_nesting_level', 3000);
 ini_set('error_reporting', E_ALL);
 ini_set('memory_limit', -1);
@@ -84,11 +82,6 @@ foreach ($sourceFiles as $sourceFile) {
         continue;
     }
     echo "[*] Instrumented: " . $sourceFile . PHP_EOL;
-}
-
-if (OPTIMIZE_WITH_FUZZ_CACHE === true) {
-    echo "[*] Starting optimization..." . PHP_EOL;
-    processFileOrDirectory(TARGET_LOCATION);
 }
 
 echo "[*] All done." . PHP_EOL;

@@ -1,7 +1,6 @@
 <?php
-namespace PHPSHMCache;
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+namespace App\Cache\PHPSHMCache;
+
 /**
  * from openemr: https://github.com/openemr/openemr/portal/patient/fwk/libs/verysimple/DB/DataDriver/MySQLi.php
  */
