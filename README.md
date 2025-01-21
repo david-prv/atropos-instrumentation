@@ -27,7 +27,7 @@ php ./src/instrumentor.php ../target
 
 ## Configuration
 To instrument WordPress, you can just use the `WordPressSinkVisitor` class. You can still adjust the
-sinks that should be considered by editing the `$functions` array in `src/visitors/WordPressSinkVisitor.php`.
+sinks that should be considered by editing the `$functions` array in `src/targets/WordPressSinkVisitor.php`.
 Sinks are given either as tuples or as literal strings. Tuples should look like `["function", "file"]`, where
 the first component is the sink's function name and the second component is the file where this sink is defined.
 If you don't exactly know the location or if there could be potentially multiple occurrences, you can just put the
@@ -58,7 +58,7 @@ $functions = [
 ```
 
 To create Atropos instrumentation for a new target (only php-based targets allowed), create a new visitor inside of
-`src/visitors/`:
+`src/targets/`:
 
 ```php
 <?php
