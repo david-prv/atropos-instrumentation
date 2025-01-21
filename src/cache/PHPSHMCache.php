@@ -1,5 +1,5 @@
 <?php
-namespace App\Cache\PHPSHMCache;
+namespace PHPSHMCache;
 
 /**
  * from openemr: https://github.com/openemr/openemr/portal/patient/fwk/libs/verysimple/DB/DataDriver/MySQLi.php
