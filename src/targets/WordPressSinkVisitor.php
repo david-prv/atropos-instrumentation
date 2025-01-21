@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Visitor;
+namespace App\Targets;
 
 class WordPressSinkVisitor extends AbstractSinkVisitor
 {

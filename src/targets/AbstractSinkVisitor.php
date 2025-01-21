@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Visitor;
+namespace App\Targets;
 
 use PhpParser\Node;
 use PhpParser\Node\Param;

@@ -12,7 +12,7 @@ if (!defined("TARGET_LOCATION")) {
  * if you want to instrument a different target application.
  */
 if (!defined("TARGET_VISITOR_CLASS")) {
-    define("TARGET_VISITOR_CLASS", \App\Visitor\WordPressSinkVisitor::class);
+    define("TARGET_VISITOR_CLASS", \App\Targets\WordPressSinkVisitor::class);
 }
 
 /**
