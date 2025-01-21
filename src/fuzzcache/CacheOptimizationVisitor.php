@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Visitor;
+namespace App\FuzzCache;
 
 use PhpParser\Error;
 use PhpParser\Node;
@@ -9,7 +9,7 @@ use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter;
 use PhpParser\NodeVisitorAbstract;
 
-class ModifyWhileLoopVisitor extends NodeVisitorAbstract
+class CacheOptimizationVisitor extends NodeVisitorAbstract
 {
     private $replacementFunctionName = 'PHPSHMCache\sqlWrapperFunc';
 

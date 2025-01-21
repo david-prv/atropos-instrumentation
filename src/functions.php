@@ -7,7 +7,7 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt;
 use PhpParser\PrettyPrinter;
 
-use App\Visitor\ModifyWhileLoopVisitor;
+use App\FuzzCache\CacheOptimizationVisitor;
 
 if (!function_exists("__parse_ast_from_code")) {
     /**
@@ -48,7 +48,7 @@ if (!function_exists("__instrument_ast")) {
         $traverser->addVisitor(new $visitor($sourceFile));
 
         if (OPTIMIZE_WITH_FUZZ_CACHE) {
-            $traverser->addVisitor(new ModifyWhileLoopVisitor());
+            $traverser->addVisitor(new CacheOptimizationVisitor());
         }
 
         return $traverser->traverse($ast);
