@@ -63,7 +63,7 @@ To create Atropos instrumentation for a new target (only php-based targets allow
 ```php
 <?php
 
-namespace App\Visitor;
+namespace App\Targets;
 
 class NewSinkVisitor extends AbstractSinkVisitor
 {
@@ -86,7 +86,7 @@ Don't forget to instruct the instrumentor to use the newly created visitor class
  * if you want to instrument a different target application.
  */
 if (!defined("TARGET_VISITOR_CLASS")) {
-    define("TARGET_VISITOR_CLASS", \App\Visitor\WordPressSinkVisitor::class);
+    define("TARGET_VISITOR_CLASS", \App\Targets\WordPressSinkVisitor::class);
 }
 ```
 
