@@ -1,6 +1,7 @@
 <?php
 namespace PHPSHMCache;
-
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 /**
  * from openemr: https://github.com/openemr/openemr/portal/patient/fwk/libs/verysimple/DB/DataDriver/MySQLi.php
  */
@@ -82,7 +83,7 @@ function clean($shmKey)
 
     if ($id !== false) {
         // The shared memory segment exists, so delete the old data
-        //print("[clean] remove $shmKey\n");
+        print("[clean] remove $shmKey\n");
         shmop_delete($id);
         return true;
     }
@@ -126,7 +127,7 @@ function read($shmKey)
     
     $id = @shmop_open($shmKey, "a", 0, 0);
     if ($id === false) {
-        #print("[read] try $shmKey but not found \n");
+        print("[read] try $shmKey but not found \n");
         return false;
     }
 
@@ -316,11 +317,11 @@ function sqlWrapperFunc($funcName, $args)
         case "mysqli_real_escape_string":
             return str_replace($BAD_CHARS, $GOOD_CHARS, $args[1]);
         case "mysqli_query":
-            if (checkSqlSyntax($args[1])) {
+            /*if (checkSqlSyntax($args[1])) {
                 // can use phpmyadmin or antlr
                 // cause an error and report back to fuzzer!
 
-            }
+            }*/
             $table = extractTableName($args[1]);
             $tablehash = $table[1];
             $queryhash = hexdec(crc32($args[1]));
@@ -333,7 +334,7 @@ function sqlWrapperFunc($funcName, $args)
                     // valid, then we can directly return the results;
                     //return read($queryhash);
                     //return end(PHPTrace::$trace)["ret"]; // return the index;
-                    //print("[query]: SELECT: valid cache\n");
+                    print("[query]: SELECT: valid cache\n");
                 }
                 else{
                     $allData = PHPTrace::redoQuery(IDX(end(PHPTrace::$trace)["ret"])); // should give idx of query// default the last one
@@ -342,7 +343,7 @@ function sqlWrapperFunc($funcName, $args)
                     write(PHPTrace::$bitmapSHMKey, $table2query);
                     // data is in cache and valid
                     //return $allData;
-                    //print("[query]: SELECT: invalid cache\n");
+                    print("[query]: SELECT: invalid cache\n");
                 }
             }
             else if ($table[0] === 'UPDATE' || $table[0] === 'INSERT') {
@@ -385,11 +386,11 @@ function sqlWrapperFunc($funcName, $args)
             && array_key_exists($queryhash, $table2query[$tablehash]) 
             && $table2query[$tablehash][$queryhash] === 1 ) {
                 // valid, then we can directly return the results;
-                //print("[fetch]: valid sql cached\n");
+                print("[fetch]: valid sql cached\n");
                 $allData = read($queryhash);
             }
             else{
-                //print("[fetch]: invalid sql and redo!\n");
+                print("[fetch]: invalid sql and redo!\n");
                 $allData = PHPTrace::redoQuery($resultIdx); // should give idx of query//
                 write($queryhash, $allData);
                 $table2query[$tablehash][$queryhash] = 1;
