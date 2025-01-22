@@ -1,13 +1,24 @@
 <?php
+/**
+ * CacheOptimizationVisitor.php
+ *
+ * @author Penghui Li <lipenghui315@gmail.com>
+ * @author David Dewes <dade00003@stud.uni-saarland.de>
+ */
 
 namespace App\FuzzCache;
 
-use PhpParser\Error;
 use PhpParser\Node;
-use PhpParser\Node\Stmt;
-use PhpParser\ParserFactory;
-use PhpParser\PrettyPrinter;
 use PhpParser\NodeVisitorAbstract;
+use PhpParser\Node\Name;
+use PhpParser\Node\Arg;
+use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Expr;
+use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\Array_;
+use PhpParser\Node\Stmt\While_;
+use PhpParser\Node\Stmt\Foreach_;
 
 class CacheOptimizationVisitor extends NodeVisitorAbstract
 {
@@ -15,72 +26,83 @@ class CacheOptimizationVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-        if ($node instanceof Stmt\While_) {
-            // Check for a while loop with mysqli_fetch_assoc
+        if ($node instanceof While_) {
+            // check for a while loop with mysqli_fetch_assoc
             if ($this->isMysqliFetchAssocLoop($node)) {
-                // Modify the while loop as needed
-                // For example, change it to a foreach loop
-                $foreachLoop = new Node\Stmt\Foreach_(
-                    $node->cond->expr,
-                    $node->cond->var
-                );
-
-                return $foreachLoop;
+                // modify the while loop as needed,
+                // for example, change it to a foreach loop
+                if (!empty($node->cond->expr) && !empty($node->cond->var)) {
+                    return new Foreach_(
+                        $node->cond->expr,
+                        $node->cond->var
+                    );
+                }
             }
         }
 
-        if ($node instanceof Node\Expr\FuncCall && $this->isMysqliQueryCall($node)) {
-            // Replace the mysqli_query call with PHPSHMCache\sqlWrapperFunc
-            $newFuncCall = new Node\Expr\FuncCall(
-                new Node\Name($this->replacementFunctionName),
+        if ($node instanceof FuncCall && $this->isMysqliQueryCall($node)) {
+            // replace the mysqli_query call with wrapped function call
+            return new FuncCall(
+                new Name($this->replacementFunctionName),
                 [
-                    new Node\Arg(new Node\Scalar\String_($node->name->toString())),
-                    new Node\Expr\Array_(
+                    new Arg(new String_($node->name->toString())),
+                    new Array_(
                         $this->getArgumentsForReplacement($node)
                     )
                 ]
             );
-
-            return $newFuncCall;
         }
 
 
         return $node;
     }
 
-    private function getArgumentsForReplacement(Node\Expr $expr)
+    private function getArgumentsForReplacement(Expr $expr): array
     {
-        // Return the arguments for the replacement function call
+        // return the arguments for the replacement function call
         $arguments = [];
-        if ($expr instanceof Node\Expr\FuncCall) {
+        if ($expr instanceof FuncCall) {
             foreach ($expr->args as $arg) {
-                $arguments[] = new Node\Arg($arg->value);
+                $arguments[] = new Arg($arg->value);
             }
         }
 
         return $arguments;
     }
 
-    private function isMysqliQueryCall(Node\Expr\FuncCall $node)
+    private function isMysqliQueryCall(FuncCall $node): bool
     {
-        return $node->name instanceof Node\Name && in_array($node->name->toString(), ['mysqli_connect', 'mysqli_query', "mysqli_close", "mysqli_error", "mysqli_connect_error", "mysqli_fetch_assoc", 'mysqli_num_rows', "mysqli_fetch_array", "mysqli_fetch_row", "mysqli_fetch_all"]);
+        return $node->name instanceof Name
+            && in_array($node->name->toString(),
+                [
+                    "mysqli_connect",
+                    "mysqli_query",
+                    "mysqli_close",
+                    "mysqli_error",
+                    "mysqli_connect_error",
+                    "mysqli_fetch_assoc",
+                    "mysqli_num_rows",
+                    "mysqli_fetch_array",
+                    "mysqli_fetch_row",
+                    "mysqli_fetch_all"
+                ]);
     }
 
-    private function isMysqliFetchAssocLoop(Node\Stmt\While_ $whileNode)
+    private function isMysqliFetchAssocLoop(While_ $whileNode): bool
     {
-        // Check if it's a while loop with mysqli_fetch_assoc
+        // check if it's a while loop with mysqli_fetch_assoc
         return (
-            $whileNode->cond instanceof Node\Expr\Assign &&
-            $whileNode->cond->expr instanceof Node\Expr\FuncCall &&
+            $whileNode->cond instanceof Assign &&
+            $whileNode->cond->expr instanceof FuncCall &&
             $this->isMysqliFetchAssocCall($whileNode->cond->expr)
         );
     }
 
-    private function isMysqliFetchAssocCall(Node\Expr\FuncCall $funcCall)
+    private function isMysqliFetchAssocCall(FuncCall $funcCall): bool
     {
-        // Check if it's a mysqli_fetch_assoc() function call
+        // check if it's a mysqli_fetch_assoc() function call
         return (
-            $funcCall->name instanceof Node\Name &&
+            $funcCall->name instanceof Name &&
             in_array($funcCall->name->toString(), array('mysqli_fetch_assoc', 'mysqli_fetch_row', 'mysqli_fetch_array'))
         );
     }

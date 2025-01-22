@@ -1,12 +1,15 @@
 <?php
+/**
+ * functions.php
+ *
+ * @author David Dewes <dade00003@stud.uni-saarland.de>
+ */
+
 
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\Error;
-use PhpParser\Node;
-use PhpParser\Node\Stmt;
-use PhpParser\PrettyPrinter;
 
 use App\FuzzCache\CacheOptimizationVisitor;
 
