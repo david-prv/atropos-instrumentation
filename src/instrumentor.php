@@ -96,5 +96,5 @@ if (OPTIMIZE_WITH_FUZZ_CACHE) {
     );
 }
 
-echo "[*] All done." . PHP_EOL;
+echo "[*] All done. (" . count($sourceFiles) . " files)" . PHP_EOL;
 exit(0);

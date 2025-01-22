@@ -106,7 +106,7 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
     protected function isSink(Node $node): bool
     {
         // we only consider function definitions here: skip.
-        if (!$node instanceof Node\Stmt\Function_) {
+        if (!($node instanceof Node\Stmt\Function_) && !($node instanceof Node\Stmt\ClassMethod)) {
             return false;
         }
 
