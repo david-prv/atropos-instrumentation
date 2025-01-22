@@ -4,6 +4,14 @@ This tool will automatically scan through a WordPress instance to instrument so-
 with crash-reporting code. This instrumentor is meant to be used along with the "Atropos" fuzzer. The goal
 is to instrument the core API of a web framework to fuzz its respective web extensions.
 
+## Contents
+
+- [Installation](#installation)
+- [Example Usage](#example-usage)
+- [Configuration](#configuration)
+    - [Targets](#targets)
+    - [Performance](#performance)
+
 ## Installation
 ```bash
 git clone https://github.com/david-prv/atropos-instrumentation.git
