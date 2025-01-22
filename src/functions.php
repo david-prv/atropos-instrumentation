@@ -1,4 +1,5 @@
 <?php
+
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
@@ -90,7 +91,7 @@ if (!function_exists("__fuzzcache_hook")) {
     /**
      * Places the FuzzCache function hook into the
      * designated entry point, as defined as constant.
-     * 
+     *
      * @param string $path The entry point.
      * @return void
      */
@@ -120,7 +121,7 @@ EOT;
         }
 
         // copy implementation to entry point folder
-        if (copy(__DIR__ . "/fuzzcache/PHPSHMCache.php", dirname($path). DIRECTORY_SEPARATOR . "PHPSHMCache.php") === false) {
+        if (copy(__DIR__ . "/fuzzcache/PHPSHMCache.php", dirname($path) . DIRECTORY_SEPARATOR . "PHPSHMCache.php") === false) {
             echo "[!] FuzzCache: Could not copy SHMCache to '" . dirname($path) . "'!" . PHP_EOL;
             return;
         }

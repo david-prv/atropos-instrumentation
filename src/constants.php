@@ -51,7 +51,7 @@ if (!defined("OPTIMIZE_WITH_FUZZ_CACHE")) {
  * Defines the entry point that can be hooked in order to
  * propagate the SHMCache of FuzzCache to the whole
  * target application.
- * 
+ *
  * NOTE:    Only needed if optimization is used. Path is
  *          relative from target's root folder!
  */

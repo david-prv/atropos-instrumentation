@@ -1,4 +1,5 @@
 <?php
+
 namespace PHPSHMCache;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -6,7 +7,7 @@ ini_set('display_errors', 1);
  * from openemr: https://github.com/openemr/openemr/portal/patient/fwk/libs/verysimple/DB/DataDriver/MySQLi.php
  */
 /** @var array characters that will be escaped */
-static $BAD_CHARS = array (
+static $BAD_CHARS = array(
     "\\",
     "\0",
     "\n",
@@ -14,10 +15,10 @@ static $BAD_CHARS = array (
     "\x1a",
     "'",
     '"'
-        );
+);
 
 /** @var array characters that will be used to replace bad chars */
-static $GOOD_CHARS = array (
+static $GOOD_CHARS = array(
     "\\\\",
     "\\0",
     "\\n",
@@ -25,12 +26,12 @@ static $GOOD_CHARS = array (
     "\Z",
     "\'",
     '\"'
-        );
+);
 
 /**
  * get a key
  */
-function getSHMKey ($path, $pj = "b") 
+function getSHMKey($path, $pj = "b")
 {
     return ftok($path, $pj);
 }
@@ -76,7 +77,7 @@ function unpack(string $data)
 /**
  * Clean data from shared memory block
  */
-function clean($shmKey) 
+function clean($shmKey)
 {
     // Check if the shared memory segment with the given shmkey exists
     $id = @shmop_open($shmKey, 'a', 0, 0);
@@ -89,7 +90,7 @@ function clean($shmKey)
     }
     return false;
 }
- 
+
 /**
  * Write data into shared memory block
  * @param mixed $data
@@ -119,12 +120,12 @@ function write($shmKey, $data, int $seconds = 0)
 
 /**
  * Read data from shared memory block
- * @return bool|mixed 
+ * @return bool|mixed
  * @return false for not exists or timeout; if enabled; data otherwise
  */
 function read($shmKey)
 {
-    
+
     $id = @shmop_open($shmKey, "a", 0, 0);
     if ($id === false) {
         print("[read] try $shmKey but not found \n");
@@ -136,7 +137,7 @@ function read($shmKey)
     $data = unpack($data);
     $result = $data['data'];
     $timeout = intval($data['timeout']);
-    if ( $timeout != 0 && $timeout < microtime()) {
+    if ($timeout != 0 && $timeout < microtime()) {
         $result = false; //timeout
     }
     //shmop_close($id);
@@ -144,7 +145,7 @@ function read($shmKey)
 }
 
 
-function getStack () 
+function getStack()
 {
     $callStack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
     // Concatenate relevant information from the call stack into a string
@@ -157,14 +158,17 @@ function getStack ()
     return $stackString;
 }
 
-function ADDR($idx) {
+function ADDR($idx)
+{
     return $idx ^ 0xFFFF0000;
 }
 
-function IDX($addr) {
+function IDX($addr)
+{
     return $addr ^ 0xFFFF0000;
 }
-function findAddr($str) 
+
+function findAddr($str)
 {
     $matches = [];
 
@@ -181,7 +185,7 @@ function findAddr($str)
     return $matches;
 }
 
-function extractTableName($sql) 
+function extractTableName($sql)
 {
     // Regular expression for matching UPDATE statement and extracting table name
     $updatePattern = '/UPDATE\s+(\w+)\s+SET/i';
@@ -190,7 +194,7 @@ function extractTableName($sql)
     if (preg_match($updatePattern, $sql, $matches)) {
         $tableName = $matches[1];
         return array("UPDATE", hexdec(crc32($tableName)));
-    } 
+    }
     // Regular expression for matching SELECT statement and extracting table name
     $selectPattern = '/FROM\s+(\w+)/i';
 
@@ -202,17 +206,18 @@ function extractTableName($sql)
     return array("None", NULL);
 }
 
-class PHPTrace 
+class PHPTrace
 {
 
     // a global variable
     public static $trace = array();
-    // $funcName, $args, $ret 
+
+    // $funcName, $args, $ret
 
     public static function sqlPutTrace($funcName, $args)
     {
         #print(var_dump($args));
-        self::$trace[] = ["funcName"=>$funcName, "args" => $args, "ret" => ADDR(count(self::$trace))];
+        self::$trace[] = ["funcName" => $funcName, "args" => $args, "ret" => ADDR(count(self::$trace))];
         return end(self::$trace)["ret"];// return the index
     }
 
@@ -232,16 +237,15 @@ class PHPTrace
         $connectIdx = IDX($queryCall["args"][0]);
         $connectCall = self::$trace[$connectIdx];
         $mysqli = call_user_func_array("mysqli_connect", $connectCall["args"]);
-	    //echo "redoSql():\tconnect: $connectIdx\tresultIdx: $resultIdx\n";
+        //echo "redoSql():\tconnect: $connectIdx\tresultIdx: $resultIdx\n";
 
-        for($i = $resultIdx -1; $i > $connectIdx; $i --) {
+        for ($i = $resultIdx - 1; $i > $connectIdx; $i--) {
             // backward search for select_db or use db
             $call = self::$trace[$i];
             if ($call["funcName"] == "mysqli_select_db") {
-                    mysqli_select_db($mysqli, $call["args"][1]);
-                    break;
-            }
-            else if ($call["funcName"] =="mysqli_query" && strpos($call["args"][1], "USE ") !== false) {
+                mysqli_select_db($mysqli, $call["args"][1]);
+                break;
+            } else if ($call["funcName"] == "mysqli_query" && strpos($call["args"][1], "USE ") !== false) {
                 #echo "redoSql():\tuseDB: $i\n";
                 // XXX check query, embedded values.
                 mysqli_query($mysqli, $call["args"][1]);
@@ -278,23 +282,23 @@ class PHPTrace
 
         $allData = mysqli_fetch_all($result, MYSQLI_BOTH);
         mysqli_close($mysqli);
-        
+
         return $allData;
     }
 
-    public static function dumpTrace($log="")
+    public static function dumpTrace($log = "")
     {
         $log = "-----\n"
-        . $log 
-        ."\n"
-        . getStack() . "\n----\n";
-        for($i = 0; $i < count(self::$trace); $i ++) {
+            . $log
+            . "\n"
+            . getStack() . "\n----\n";
+        for ($i = 0; $i < count(self::$trace); $i++) {
             $t = self::$trace[$i];
-            $log .= $i . ": " . $t["funcName"]. "("
-            . implode(",", $t["args"])
-            . ")@"
-            . dechex($t["ret"])
-            . "\n";
+            $log .= $i . ": " . $t["funcName"] . "("
+                . implode(",", $t["args"])
+                . ")@"
+                . dechex($t["ret"])
+                . "\n";
         }
         $customLogFile = "/tmp/php.log";
         error_log($log, 3, $customLogFile);
@@ -302,9 +306,8 @@ class PHPTrace
 }
 
 
-
 /**
- * record the sql function calls in trace 
+ * record the sql function calls in trace
  */
 function sqlWrapperFunc($funcName, $args)
 {
@@ -327,16 +330,15 @@ function sqlWrapperFunc($funcName, $args)
             $queryhash = hexdec(crc32($args[1]));
             if ($table[0] === 'SELECT') {
                 $table2query = read(PHPTrace::$bitmapSHMKey);
-                $table2query = ($table2query!== false)? $table2query: array(); 
-                if(array_key_exists($tablehash , $table2query) 
-                && array_key_exists($queryhash, $table2query[$tablehash]) 
-                && $table2query[$tablehash][$queryhash] === 1 ) {
+                $table2query = ($table2query !== false) ? $table2query : array();
+                if (array_key_exists($tablehash, $table2query)
+                    && array_key_exists($queryhash, $table2query[$tablehash])
+                    && $table2query[$tablehash][$queryhash] === 1) {
                     // valid, then we can directly return the results;
                     //return read($queryhash);
                     //return end(PHPTrace::$trace)["ret"]; // return the index;
                     print("[query]: SELECT: valid cache\n");
-                }
-                else{
+                } else {
                     $allData = PHPTrace::redoQuery(IDX(end(PHPTrace::$trace)["ret"])); // should give idx of query// default the last one
                     write($queryhash, $allData);
                     $table2query[$tablehash][$queryhash] = 1;
@@ -345,21 +347,19 @@ function sqlWrapperFunc($funcName, $args)
                     //return $allData;
                     print("[query]: SELECT: invalid cache\n");
                 }
-            }
-            else if ($table[0] === 'UPDATE' || $table[0] === 'INSERT') {
-                
+            } else if ($table[0] === 'UPDATE' || $table[0] === 'INSERT') {
+
                 $allData = PHPTrace::redoQuery(IDX(end(PHPTrace::$trace)["ret"]));
                 write($queryhash, $allData);
                 // update 
                 $table2query = read(PHPTrace::$bitmapSHMKey);
-                if(array_key_exists($tablehash , $table2query)) {
+                if (array_key_exists($tablehash, $table2query)) {
                     foreach ($table2query[$tablehash] as $sql) {
                         $table2query[$tablehash][$sql] = 0;
                     }
                     write(PHPTrace::$bitmapSHMKey, $table2query);
                 }
-            }
-            else{
+            } else {
                 //print($args[1]);
             }
 
@@ -369,27 +369,26 @@ function sqlWrapperFunc($funcName, $args)
         case "mysqli_error":
         case "mysqli_connect_error":
             return true; // usually no return value
-        
+
         case "mysqli_fetch_assoc":
         case  "mysqli_fetch_array":
         case "mysqli_fetch_row":
-        case "mysqli_fetch_all":   
-        case "mysqli_num_rows": 
+        case "mysqli_fetch_all":
+        case "mysqli_num_rows":
             $resultIdx = IDX($args[0]);
-            
+
             $queryhash = hexdec(crc32(PHPTrace::$trace[$resultIdx]["args"][1]));
             $table = extractTableName(PHPTrace::$trace[$resultIdx]["args"][1]);
             $tablehash = $table[1];
             $table2query = read(PHPTrace::$bitmapSHMKey);
 
-            if(array_key_exists($tablehash , $table2query) 
-            && array_key_exists($queryhash, $table2query[$tablehash]) 
-            && $table2query[$tablehash][$queryhash] === 1 ) {
+            if (array_key_exists($tablehash, $table2query)
+                && array_key_exists($queryhash, $table2query[$tablehash])
+                && $table2query[$tablehash][$queryhash] === 1) {
                 // valid, then we can directly return the results;
                 print("[fetch]: valid sql cached\n");
                 $allData = read($queryhash);
-            }
-            else{
+            } else {
                 print("[fetch]: invalid sql and redo!\n");
                 $allData = PHPTrace::redoQuery($resultIdx); // should give idx of query//
                 write($queryhash, $allData);
@@ -397,9 +396,9 @@ function sqlWrapperFunc($funcName, $args)
                 write(PHPTrace::$bitmapSHMKey, $table2query);
                 // data is in cache and valid
             }
-            return ($funcName === "mysqli_num_rows")? count($allData): $allData;
+            return ($funcName === "mysqli_num_rows") ? count($allData) : $allData;
         case "mysqli_fetch_lengths":
             return array(0);
-        }
-        return false;
+    }
+    return false;
 }
