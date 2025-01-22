@@ -84,5 +84,17 @@ foreach ($sourceFiles as $sourceFile) {
     echo "[*] Instrumented: " . $sourceFile . PHP_EOL;
 }
 
+if (OPTIMIZE_WITH_FUZZ_CACHE) {
+    // here, we place the SHMCache implementation into
+    // the folder that's available for the target entrypoint.
+    // additionally, the entrypoint is modified to import
+    // the custom namespace.
+    __fuzzcache_hook(
+        realpath(
+            trim(TARGET_LOCATION)
+        ) . DIRECTORY_SEPARATOR . TARGET_ENTRY_POINT
+    );
+}
+
 echo "[*] All done." . PHP_EOL;
 exit(0);

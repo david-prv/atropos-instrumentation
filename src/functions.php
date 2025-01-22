@@ -86,3 +86,45 @@ if (!function_exists("__adjust_path_separators")) {
     }
 }
 
+if (!function_exists("__fuzzcache_hook")) {
+    /**
+     * Places the FuzzCache function hook into the
+     * designated entry point, as defined as constant.
+     * 
+     * @param string $path The entry point.
+     * @return void
+     */
+    function __fuzzcache_hook(string $path): void
+    {
+        $header = <<<EOT
+<?php
+
+/** Imports the SHMCache implementation of FuzzCache. */
+require __DIR__ . '/PHPSHMCache.php';
+EOT;
+        if (!file_exists($path)) {
+            echo "[!] FuzzCache: Can not find entry point '" . $path . "'!" . PHP_EOL;
+            return;
+        }
+
+        // strip away the opening tag of that file
+        $entrySource = str_replace("<?php", "", file_get_contents($path));
+
+        // add hooked header
+        $hookedSource = $header . "\n\n" . $entrySource;
+
+        // overload file contents with modified code
+        if (file_put_contents($path, $hookedSource) === false) {
+            echo "[!] FuzzCache: Can not place hooked entry point to '" . $path . "'!" . PHP_EOL;
+            return;
+        }
+
+        // copy implementation to entry point folder
+        if (copy(__DIR__ . "/fuzzcache/PHPSHMCache.php", dirname($path). DIRECTORY_SEPARATOR . "PHPSHMCache.php") === false) {
+            echo "[!] FuzzCache: Could not copy SHMCache to '" . dirname($path) . "'!" . PHP_EOL;
+            return;
+        }
+
+        return;
+    }
+}
