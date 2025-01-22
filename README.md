@@ -11,7 +11,7 @@ cd atropos-instrumentation
 composer install
 ```
 
-## Example
+## Example Usage
 ```bash
 # Install WordPress CLI tool
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -26,6 +26,9 @@ php ./src/instrumentor.php ../target
 ```
 
 ## Configuration
+
+### Targets
+
 To instrument WordPress, you can just use the `WordPressSinkVisitor` class. You can still adjust the
 sinks that should be considered by editing the `$functions` array in `src/targets/WordPressSinkVisitor.php`.
 Sinks are given either as tuples or as literal strings. Tuples should look like `["function", "file"]`, where
@@ -91,3 +94,7 @@ if (!defined("TARGET_VISITOR_CLASS")) {
 ```
 
 Replace the Visitor class name with your new class.
+
+### Performance
+
+We integrated the PHPSHMCache implementation as introduced by [FuzzCache](https://peng-hui.github.io/data/paper/ccs24_fuzzcache.pdf) into our instrumentation. This allows us to speed-up the target application by the factor 3x to 4x. However, you can toggle the cache optimization using the `OPTIMIZE_WITH_FUZZ_CACHE` constant in `src/constants.php`. It is enabled by default, since our main target is WordPress, which in itself has a poor performance, especially if plugins are programmed in an inefficient way or if the end-user does not know how to properly use uploaded media, compared to other slim web frameworks (compare [here](https://wordpress.com/support/site-speed/) or [here](https://instawp.com/wordpress-running-slow/)).
