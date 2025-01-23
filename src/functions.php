@@ -127,7 +127,5 @@ EOT;
             echo "[!] FuzzCache: Could not copy SHMCache to '" . dirname($path) . "'!" . PHP_EOL;
             return;
         }
-
-        return;
     }
 }

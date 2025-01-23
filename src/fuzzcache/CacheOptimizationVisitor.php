@@ -22,7 +22,7 @@ use PhpParser\Node\Stmt\Foreach_;
 
 class CacheOptimizationVisitor extends NodeVisitorAbstract
 {
-    private string $replacementFunctionName = 'PHPSHMCache\sqlWrapperFunc';
+    private string $replacementFunctionName = "PHPSHMCache\sqlWrapperFunc";
 
     public function enterNode(Node $node)
     {
@@ -103,7 +103,11 @@ class CacheOptimizationVisitor extends NodeVisitorAbstract
         // check if it's a mysqli_fetch_assoc() function call
         return (
             $funcCall->name instanceof Name &&
-            in_array($funcCall->name->toString(), array('mysqli_fetch_assoc', 'mysqli_fetch_row', 'mysqli_fetch_array'))
+            in_array($funcCall->name->toString(), [
+                "mysqli_fetch_assoc",
+                "mysqli_fetch_row",
+                "mysqli_fetch_array"
+            ])
         );
     }
 }
