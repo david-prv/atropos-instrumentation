@@ -5,7 +5,6 @@
  * @author David Dewes <dade00003@stud.uni-saarland.de>
  */
 
-
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;

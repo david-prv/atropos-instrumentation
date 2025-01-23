@@ -5,7 +5,6 @@
  * @author David Dewes <dade00003@stud.uni-saarland.de>
  */
 
-
 /**
  * The location of the WordPress instance.
  * (Passed via command-line)

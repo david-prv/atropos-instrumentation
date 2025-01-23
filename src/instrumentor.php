@@ -5,7 +5,6 @@
  * @author David Dewes <dade00003@stud.uni-saarland.de>
  */
 
-
 namespace App;
 
 require(__DIR__ . "/../vendor/autoload.php");
