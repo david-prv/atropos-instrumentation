@@ -50,7 +50,7 @@ if (!defined("BUG_TRIGGERED_LOCATION")) {
  * of the target application, as e.g. WordPress.
  */
 if (!defined("OPTIMIZE_WITH_FUZZ_CACHE")) {
-    define("OPTIMIZE_WITH_FUZZ_CACHE", true);
+    define("OPTIMIZE_WITH_FUZZ_CACHE", false);
 }
 
 /**
