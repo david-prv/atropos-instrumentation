@@ -12,6 +12,17 @@ use PhpParser\Error;
 
 use App\FuzzCache\CacheOptimizationVisitor;
 
+if (PHP_VERSION_ID < 80000) {
+    // do some backward compatibility magic
+
+    if (!function_exists("str_starts_with")) {
+        function str_starts_with(string $haystack, string $needle): bool
+        {
+            return substr($haystack, 0, strlen($needle)) === $needle;
+        }
+    }
+}
+
 if (!function_exists("__parse_ast_from_code")) {
     /**
      * Transforms string representation of php code into an AST.
