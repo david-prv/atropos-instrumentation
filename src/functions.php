@@ -89,6 +89,7 @@ if (!function_exists("__adjust_path_separators")) {
     }
 }
 
+/* @legacy */
 if (!function_exists("__fuzzcache_hook")) {
     /**
      * Places the FuzzCache function hook into the

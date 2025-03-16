@@ -50,7 +50,18 @@ if (!defined("BUG_TRIGGERED_LOCATION")) {
  * of the target application, as e.g. WordPress.
  */
 if (!defined("OPTIMIZE_WITH_FUZZ_CACHE")) {
-    define("OPTIMIZE_WITH_FUZZ_CACHE", true);
+    define("OPTIMIZE_WITH_FUZZ_CACHE", false);
+}
+
+/**
+ * Defines the location of the fuzzcache shared memory
+ * cache support.
+ * 
+ * NOTE:    Only needed if optimization is used. Path is
+ *          relative from target's root folder!
+ */
+if (!defined("FUZZ_CACHE_SHM_CLASS")) {
+    define("FUZZ_CACHE_SHM_CLASS", __DIR__ . "/fuzzcache/PHPSHMCache.php");
 }
 
 /**
@@ -60,6 +71,8 @@ if (!defined("OPTIMIZE_WITH_FUZZ_CACHE")) {
  *
  * NOTE:    Only needed if optimization is used. Path is
  *          relative from target's root folder!
+ * 
+ * @legacy
  */
 if (!defined("TARGET_ENTRY_POINT") && OPTIMIZE_WITH_FUZZ_CACHE) {
     define("TARGET_ENTRY_POINT", "wp-load.php");
