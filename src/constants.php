@@ -46,6 +46,14 @@ if (!defined("BUG_TRIGGERED_LOCATION")) {
 }
 
 /**
+ * Disables the output of the instrumentor code.
+ * Errors are still reported.
+ */
+if (!defined("SILENT_MODE")) {
+    define("SILENT_MODE", false);
+}
+
+/**
  * Toggles the use of "FuzzCache" to improve the performance
  * of the target application, as e.g. WordPress.
  */

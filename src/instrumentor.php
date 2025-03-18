@@ -56,7 +56,7 @@ foreach ($fileIterator as $file) {
         // additionally, ignore all plugins/themes
         || strpos($filePath, "wp-content" . DIRECTORY_SEPARATOR . "plugins")
         || strpos($filePath, "wp-content" . DIRECTORY_SEPARATOR . "themes")) {
-        echo "[*] Skipped: " . $filePath . PHP_EOL;
+        if (!SILENT_MODE) echo "[*] Skipped: " . $filePath . PHP_EOL;
         continue;
     }
 
@@ -87,8 +87,8 @@ foreach ($sourceFiles as $sourceFile) {
         echo "[!] Instrumented file could not be saved to: " . $sourceFile . PHP_EOL;
         continue;
     }
-    echo "[*] Instrumented: " . $sourceFile . PHP_EOL;
+    if (!SILENT_MODE) echo "[*] Instrumented: " . $sourceFile . PHP_EOL;
 }
 
-echo "[*] All done. (" . count($sourceFiles) . " files)" . PHP_EOL;
+if (!SILENT_MODE) echo "[*] All done. (" . count($sourceFiles) . " files)" . PHP_EOL;
 exit(0);
