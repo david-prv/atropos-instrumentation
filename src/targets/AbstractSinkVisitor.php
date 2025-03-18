@@ -216,7 +216,7 @@ function {$functionName}({$functionParams}) {
     \$isCrash = false;
     \$arg_list = func_get_args();
     for (\$i = 0; \$i < func_num_args(); \$i++) {
-        if (is_string(\$arg_list[\$i]) && str_contains(\$arg_list[\$i], "crash")) {
+        if (is_string(\$arg_list[\$i]) && strpos(\$arg_list[\$i], "crash") !== false) {
             \$isCrash = true;
             break;
         }

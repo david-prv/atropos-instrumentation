@@ -21,6 +21,13 @@ if (PHP_VERSION_ID < 80000) {
             return substr($haystack, 0, strlen($needle)) === $needle;
         }
     }
+
+    if (!function_exists("str_contains")) {
+        function str_contains(string $haystack, string $needle): bool
+        {
+            return strpos($haystack, $needle) !== false;
+        }
+    }
 }
 
 if (!function_exists("__parse_ast_from_code")) {
