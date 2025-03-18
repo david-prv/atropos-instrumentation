@@ -63,17 +63,3 @@ if (!defined("OPTIMIZE_WITH_FUZZ_CACHE")) {
 if (!defined("FUZZ_CACHE_SHM_CLASS")) {
     define("FUZZ_CACHE_SHM_CLASS", __DIR__ . "/fuzzcache/PHPSHMCache.php");
 }
-
-/**
- * Defines the entry point that can be hooked in order to
- * propagate the SHMCache of FuzzCache to the whole
- * target application.
- *
- * NOTE:    Only needed if optimization is used. Path is
- *          relative from target's root folder!
- * 
- * @legacy
- */
-if (!defined("TARGET_ENTRY_POINT") && OPTIMIZE_WITH_FUZZ_CACHE) {
-    define("TARGET_ENTRY_POINT", "wp-load.php");
-}
