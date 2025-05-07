@@ -225,7 +225,8 @@ function {$functionName}({$functionParams}) {
         if(!\$fp = fopen("{$fileTriggered}", "a+")) {
             die("ATROPOS ERROR: Unable to open file '{$fileTriggered}'!");
         }
-        fwrite(\$fp, "bug oracle triggered: {$functionName} called");
+        \$caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? "unknown";
+        fwrite(\$fp, "bug oracle triggered: '{$functionName}' called by '\$caller'\\n");
     }
 
     {$functionBody}
