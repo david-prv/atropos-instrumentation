@@ -228,7 +228,7 @@ function {$functionName}({$functionParams}) {
         \$caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? "unknown";
         \$caller_file = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'] ?? "unknown";
         \$caller_line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'] ?? 0;
-        fwrite(\$fp, "bug oracle triggered: '{$functionName}' called by '\$caller' in \$caller_file line \$caller_line\\n");
+        fwrite(\$fp, "bug oracle triggered: '{$functionName}' called by '\$caller' in '\$caller_file' at line \$caller_line\\n");
     }
 
     {$functionBody}
