@@ -210,17 +210,34 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
             );
 
             // the instrument's payload.
+            // TODO: we might forget some edge cases here.
             $payload = <<<EOT
 {$functionComment}
 function {$functionName}({$functionParams}) {
     \$isCrash = false;
     \$arg_list = func_get_args();
+    \$flagged_arg = null;
+    
     for (\$i = 0; \$i < func_num_args(); \$i++) {
+        // check if the argument is a string and contains "crash" 
         if (is_string(\$arg_list[\$i]) && strpos(\$arg_list[\$i], "crash") !== false) {
             \$isCrash = true;
+            \$flagged_arg = \$arg_list[\$i];
             break;
         }
+
+        // check if the argument is an array and contains an element that contains "crash"
+        if (is_array(\$arg_list[\$i])) {
+            foreach (\$arg_list[\$i] as \$value) {
+                if (is_string(\$value) && strpos(\$value, "crash") !== false) {
+                    \$isCrash = true;
+                    \$flagged_arg = \$value;
+                    break 2; // break out of both loops
+                }
+            }
+        }
     }
+
     if (\$isCrash && file_exists("{$fileEnabled}")) {
         if(!\$fp = fopen("{$fileTriggered}", "a+")) {
             die("ATROPOS ERROR: Unable to open file '{$fileTriggered}'!");
@@ -228,7 +245,7 @@ function {$functionName}({$functionParams}) {
         \$caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? "unknown";
         \$caller_file = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'] ?? "unknown";
         \$caller_line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'] ?? 0;
-        fwrite(\$fp, "bug oracle triggered: '{$functionName}' called by '\$caller' in '\$caller_file' at line \$caller_line\\n");
+        fwrite(\$fp, "bug oracle triggered: '{$functionName}' called with arg '{\$flagged_arg}' by '\$caller' in '\$caller_file' at line \$caller_line\\n");
     }
 
     {$functionBody}

@@ -43,7 +43,8 @@ class WordPressSinkVisitor extends AbstractSinkVisitor
             ["escape", "/wp-includes/class-wp-xmlrpc-server.php"],
             ["wp_redirect", "/wp-includes/pluggable.php"],
             ["do_action", "/wp-includes/plugin.php"],
-            ["install", "/includes/class-plugin-upgrader.php"]
+            ["install", "/wp-includes/class-plugin-upgrader.php"],
+            ["activate_plugin", "/wp-includes/plugin.php"]
         ];
 
         parent::__construct($filePath, $functions);
