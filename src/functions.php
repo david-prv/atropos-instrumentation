@@ -30,14 +30,14 @@ if (PHP_VERSION_ID < 80000) {
     }
 }
 
-if (!function_exists("__parse_ast_from_code")) {
+if (!function_exists("parse_ast_from_code")) {
     /**
      * Transforms string representation of php code into an AST.
      *
      * @param string $code The source code to parse.
      * @return PhpParser\Node\Stmt[] The AST as array.
      */
-    function __parse_ast_from_code(string $code): array
+    function parse_ast_from_code(string $code): array
     {
         $parser = (new ParserFactory())->createForNewestSupportedVersion();
         if (!str_starts_with($code, "<?php")) {
@@ -54,7 +54,7 @@ if (!function_exists("__parse_ast_from_code")) {
     }
 }
 
-if (!function_exists("__instrument_ast")) {
+if (!function_exists("instrument_ast")) {
     /**
      * Instruments an AST with feedback mechanism.
      *
@@ -63,7 +63,7 @@ if (!function_exists("__instrument_ast")) {
      * @param string $sourceFile The location of the source file.
      * @return array The instrumented AST as array.
      */
-    function __instrument_ast(array $ast, string $visitor, string $sourceFile): array
+    function instrument_ast(array $ast, string $visitor, string $sourceFile): array
     {
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new $visitor($sourceFile));
@@ -76,7 +76,7 @@ if (!function_exists("__instrument_ast")) {
     }
 }
 
-if (!function_exists("__unparse_ast_to_code")) {
+if (!function_exists("unparse_ast_to_code")) {
     /**
      * Transforms AST back into string representation.
      *
@@ -84,7 +84,7 @@ if (!function_exists("__unparse_ast_to_code")) {
      * @param bool $ignoreTag Toggles the php start-tag.
      * @return string The string representation.
      */
-    function __unparse_ast_to_code(array $ast, bool $ignoreTag = false): string
+    function unparse_ast_to_code(array $ast, bool $ignoreTag = false): string
     {
         $prettyPrinter = new Standard();
         if ($ignoreTag) {
@@ -94,15 +94,21 @@ if (!function_exists("__unparse_ast_to_code")) {
     }
 }
 
-if (!function_exists("__adjust_path_separators")) {
+if (!function_exists("adjust_path_separators")) {
     /**
      * Standardizes location paths by adjusting their separators.
      *
      * @param string $path The path to correct.
+     * @param bool $prepend Prepend the target VM location.
      * @return string The standardized path.
      */
-    function __adjust_path_separators(string $path): string
+    function adjust_path_separators(string $path, bool $prepend = false): string
     {
+        if ($prepend)
+            return
+                adjust_path_separators(TARGET_VM_LOCATION) .
+                str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $path);
+
         return str_replace(array("/", "\\"), DIRECTORY_SEPARATOR, $path);
     }
 }

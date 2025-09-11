@@ -29,6 +29,10 @@ if (!defined("EXCLUDE_LOCATION")) {
     define("EXCLUDE_LOCATION", $argv[2] ?? NULL);
 }
 
+// ------------------------------------------------------------------------------------
+// That's it. Everything below should only be touched if you know what you're doing!
+// ------------------------------------------------------------------------------------
+
 /**
  * The location of the `bug_oracle_enabled` file, as
  * used by Atropos to indicate whether bug oracles are used.
@@ -43,6 +47,17 @@ if (!defined("BUG_ORACLE_ENABLED_LOCATION")) {
  */
 if (!defined("BUG_TRIGGERED_LOCATION")) {
     define("BUG_TRIGGERED_LOCATION", "/tmp/bug_triggered");
+}
+
+/**
+ * The location of the target under test. You
+ * should basically never touch this variable, except you're
+ * using virtual hosts inside the target VM.
+ */
+if (!defined("TARGET_VM_LOCATION")) {
+    define("TARGET_VM_LOCATION", '/var/www/html');
+    //                           ^             ^
+    // Keep single quotes to prevent string sequences
 }
 
 /**
@@ -64,7 +79,7 @@ if (!defined("OPTIMIZE_WITH_FUZZ_CACHE")) {
 /**
  * Defines the location of the fuzzcache shared memory
  * cache support.
- * 
+ *
  * NOTE:    Only needed if optimization is used. Path is
  *          relative from target's root folder!
  */

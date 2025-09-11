@@ -19,6 +19,16 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
     protected array $sinks = [];
 
     /**
+     * @var array Functions that are intended to propagate tainted values to sinks.
+     */
+    protected array $ignoredCallerFunctions = [];
+
+    /**
+     * @var array Files that are involved in intended internal tainted value propagation.
+     */
+    protected array $ignoredCallerFiles = [];
+
+    /**
      * @var array The files that contain sinks.
      */
     protected array $files = [];
@@ -44,9 +54,16 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
      * @param string $filePath The source file path.
      * @param array $functions The sinks as array.
      */
-    public function __construct(string $filePath, array $functions)
+    public function __construct(string $filePath, array $functions, array $ignoredCallers)
     {
-        $this->filePath = __adjust_path_separators($filePath);
+        if (count($ignoredCallers) === 2) {
+            $this->ignoredCallerFunctions = $ignoredCallers[0];
+            $this->ignoredCallerFiles = array_map(function ($file) {
+                return adjust_path_separators($file, true);
+            }, $ignoredCallers[1]);
+        }
+
+        $this->filePath = adjust_path_separators($filePath);
         $this->enforceTraversal = false;
 
         foreach ($functions as $function) {
@@ -66,25 +83,25 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
      * of each file's AST. For nested arrays that aren't tuples, we
      * flatten the array. For valid tuples, we standardize the file path.
      *
-     * @param $function The sink function to register.
+     * @param $function array|string The sink function to register.
      * @return void
      */
-    protected function addSink($function): void
+    protected function addSink(array|string $function): void
     {
         if (is_array($function)) {
             if (count($function) > 1) {
-                // we want the correct directory separator here
-                $function[1] = __adjust_path_separators($function[1]);
+                // We want the correct directory separator here.
+                $function[1] = adjust_path_separators($function[1]);
             } else if (count($function) == 1) {
-                // if there is only one element, treat it as non-array
+                // If there is only one element, treat it as non-array
                 $function = $function[0];
             } else {
-                // if there is no element: abort.
+                // If there is no element: Abort.
                 return;
             }
         } else {
-            // we encountered an element with unknown location!
-            // thus, we won't skip the traversal of this AST, since
+            // We encountered an element with unknown location!
+            // Thus, we won't skip the traversal of this AST, since
             // we can't know if it's important or not.
             $this->enforceTraversal = true;
         }
@@ -99,7 +116,7 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
      */
     protected function addFile(string $filePath): void
     {
-        $this->files[] = __adjust_path_separators($filePath);
+        $this->files[] = adjust_path_separators($filePath);
     }
 
     /**
@@ -110,35 +127,35 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
      */
     protected function isSink(Node $node): bool
     {
-        // we only consider function definitions here: skip.
+        // We only consider function definitions here: Skip.
         if (!($node instanceof Node\Stmt\Function_) && !($node instanceof Node\Stmt\ClassMethod)) {
             return false;
         }
 
-        // this sink definition was already patched: skip.
+        // This sink definition was already patched: Skip.
         if (in_array(strtolower($node->name->toString()), $this->found)) {
             return false;
         }
 
         foreach ($this->sinks as $sink) {
-            // by default, we only know a generic function name.
-            // however, the user can still provide a file location, to
+            // By default, we only know a generic function name.
+            // However, the user can still provide a file location, to
             // which the sink detection is then bound.
             $functionName = $sink;
             $boundLocation = NULL;
 
-            // if the sink contains a bound location,
+            // If the sink contains a bound location,
             // unpack the information into two separate variables.
             if (is_array($sink)) {
                 [$functionName, $boundLocation] = $sink;
             }
 
-            // if there is a location specified, but they don't match: skip.
+            // If there is a location specified, but they don't match: Skip.
             if (!is_null($boundLocation) && (!str_contains($this->filePath, $boundLocation))) {
                 continue;
             }
 
-            // if the currently visited function's name is equal to
+            // If the currently visited function's name is equal to
             // the current sink, report true.
             if (strtolower($functionName) === strtolower($node->name->toString())) {
                 $this->found[] = strtolower($functionName);
@@ -163,12 +180,12 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
             $relevant = $relevant || str_contains($this->filePath, $file);
         }
 
-        // if sinks contain elements with unknown locations, we NEVER want to skip traversal.
-        // i.e. we enforce traversal here.
+        // If sinks contain elements with unknown locations, we NEVER want to skip traversal.
+        // I.e. we enforce traversal here.
         $relevant = $this->enforceTraversal || $relevant;
 
         if (!$relevant) {
-            // if current file does not contain a method to instrument,
+            // If current file does not contain a method to instrument,
             // we stop traversal by returning a stop signal.
             return self::STOP_TRAVERSAL;
         }
@@ -184,16 +201,16 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node): ?Node\Stmt
     {
-        // check whether node is a relevant sink.
+        // Check whether node is a relevant sink.
         if ($this->isSink($node)) {
-            // the files used by Atropos.
+            // The files used by Atropos.
             $fileEnabled = BUG_ORACLE_ENABLED_LOCATION;
             $fileTriggered = BUG_TRIGGERED_LOCATION;
 
-            // all function components we want to keep.
+            // All function components we want to keep.
             $functionComment = $node->getDocComment()->getText();
             $functionName = $node->name->toString();
-            $functionBody = __unparse_ast_to_code($node->stmts, true);
+            $functionBody = unparse_ast_to_code($node->stmts, true);
             $functionParams = implode(
                 ", ",
                 array_map(
@@ -201,7 +218,7 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
                         $type = $param->type ? $param->type->toString() . ' ' : '';
                         $byRef = $param->byRef ? '&' : '';
                         $variadic = $param->variadic ? '...' : '';
-                        $default = $param->default ? ' = ' . __unparse_ast_to_code([$param->default], true) : '';
+                        $default = $param->default ? ' = ' . unparse_ast_to_code([$param->default], true) : '';
 
                         return "{$type}{$byRef}{$variadic}\${$param->var->name}{$default}";
                     },
@@ -209,35 +226,28 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
                 )
             );
 
-            // the instrument's payload.
-            // TODO: we might forget some edge cases here.
+            // Reduce FPR by ignoring internal behavior that may trigger crash oracles otherwise
+            $ignoredCallerFunctionsJSON = json_encode($this->ignoredCallerFunctions, JSON_UNESCAPED_SLASHES);
+            $ignoredCallerFilesJSON = stripslashes(json_encode($this->ignoredCallerFiles, JSON_UNESCAPED_SLASHES));
+
+            if (!$ignoredCallerFunctionsJSON || !$ignoredCallerFilesJSON) {
+                // Something went wrong, maybe malformed configuration.
+                // TODO: Better error handling! So far, we're just ignoring the node.
+                return null;
+            }
+
+            // The instrument's payload.
             $payload = <<<EOT
 {$functionComment}
 function {$functionName}({$functionParams}) {
     \$isCrash = false;
     \$arg_list = func_get_args();
-    \$flagged_arg = null;
-    
     for (\$i = 0; \$i < func_num_args(); \$i++) {
-        // check if the argument is a string and contains "crash" 
         if (is_string(\$arg_list[\$i]) && strpos(\$arg_list[\$i], "crash") !== false) {
             \$isCrash = true;
-            \$flagged_arg = \$arg_list[\$i];
             break;
         }
-
-        // check if the argument is an array and contains an element that contains "crash"
-        if (is_array(\$arg_list[\$i])) {
-            foreach (\$arg_list[\$i] as \$value) {
-                if (is_string(\$value) && strpos(\$value, "crash") !== false) {
-                    \$isCrash = true;
-                    \$flagged_arg = \$value;
-                    break 2; // break out of both loops
-                }
-            }
-        }
     }
-
     if (\$isCrash && file_exists("{$fileEnabled}")) {
         if(!\$fp = fopen("{$fileTriggered}", "a+")) {
             die("ATROPOS ERROR: Unable to open file '{$fileTriggered}'!");
@@ -245,17 +255,20 @@ function {$functionName}({$functionParams}) {
         \$caller = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['function'] ?? "unknown";
         \$caller_file = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['file'] ?? "unknown";
         \$caller_line = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1]['line'] ?? 0;
-        fwrite(\$fp, "bug oracle triggered: '{$functionName}' called with arg '{\$flagged_arg}' by '\$caller' in '\$caller_file' at line \$caller_line\\n");
+        
+        if (!in_array(\$caller, {$ignoredCallerFunctionsJSON}) && !in_array(\$caller_file, {$ignoredCallerFilesJSON})) {
+            fwrite(\$fp, "bug oracle triggered: '{$functionName}' called by '\$caller' in '\$caller_file' at line \$caller_line\\n");
+        }
     }
 
     {$functionBody}
 }
 EOT;
-            // iff it is a relevant sink, replace it with instrumented version.
-            return __parse_ast_from_code($payload)[0];
+            // Iff it is a relevant sink, replace it with instrumented version.
+            return parse_ast_from_code($payload)[0];
         }
 
-        // if node is irrelevant, keep it.
+        // If node is irrelevant, keep it.
         return null;
     }
 }

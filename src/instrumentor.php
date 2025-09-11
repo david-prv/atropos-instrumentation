@@ -24,17 +24,17 @@ assert(
 $sourceFiles = [];
 $ignoredFiles = [];
 
-// if files should be excluded, parse them.
+// If files should be excluded, parse them.
 if (!is_null(EXCLUDE_LOCATION)) {
     $ignoredFiles = explode("\n", file_get_contents(EXCLUDE_LOCATION));
 
-    // if it was not successful, use an empty array.
-    // otherwise, trim the entries to prevent encoding related issues.
+    // If it was not successful, use an empty array.
+    // Otherwise, trim the entries to prevent encoding related issues.
     if (!$ignoredFiles) $ignoredFiles = [];
     else $ignoredFiles = array_map("trim", $ignoredFiles);
 }
 
-// iterator that iterated over all *.php files recursively.
+// Iterator that iterated over all *.php files recursively.
 $fileIterator = new \RegexIterator(
     new \RecursiveIteratorIterator(
         new \RecursiveDirectoryIterator(TARGET_LOCATION)
@@ -42,13 +42,13 @@ $fileIterator = new \RegexIterator(
     "/^.+\.php$/i", \RegexIterator::GET_MATCH
 );
 
-// collect all source files, ignore the excluded ones.
+// Collect all source files, ignore the excluded ones.
 foreach ($fileIterator as $file) {
     $filePath = realpath(trim($file[0]));
     $dirName = trim(dirname($filePath));
     $fileName = trim(basename($filePath));
 
-    // ignore all files that were listed in the exclusion list.
+    // Ignore all files that were listed in the exclusion list.
     if (in_array($filePath, $ignoredFiles)
         || in_array($fileName, $ignoredFiles)
         || in_array($dirName, $ignoredFiles)
@@ -71,18 +71,18 @@ foreach ($sourceFiles as $sourceFile) {
         continue;
     }
 
-    // get AST from source code
-    $ast = __parse_ast_from_code($code);
+    // Get AST from source code
+    $ast = parse_ast_from_code($code);
     assert($ast !== []);
 
-    // instrument AST iff relevant
-    $instrumented = __instrument_ast($ast, TARGET_VISITOR_CLASS, $sourceFile);
+    // Instrument AST iff relevant
+    $instrumented = instrument_ast($ast, TARGET_VISITOR_CLASS, $sourceFile);
     assert($instrumented !== []);
 
-    // transform instrumented AST back to source code
-    $finalCode = __unparse_ast_to_code($instrumented);
+    // Transform instrumented AST back to source code
+    $finalCode = unparse_ast_to_code($instrumented);
 
-    // override source code with new version
+    // Override source code with new version
     if (!file_put_contents($sourceFile, $finalCode)) {
         echo "[!] Instrumented file could not be saved to: " . $sourceFile . PHP_EOL;
         continue;
