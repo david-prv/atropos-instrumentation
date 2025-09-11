@@ -177,7 +177,8 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
         $relevant = false;
 
         foreach ($this->files as $file) {
-            $relevant = $relevant || str_contains($this->filePath, $file);
+            $relevant = str_contains($this->filePath, $file);
+            if ($relevant) break;
         }
 
         // If sinks contain elements with unknown locations, we NEVER want to skip traversal.
