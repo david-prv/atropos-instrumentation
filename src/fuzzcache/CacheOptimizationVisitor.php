@@ -83,10 +83,10 @@ class CacheOptimizationVisitor extends NodeVisitorAbstract
     private function isMysqliQueryCall(FuncCall $node): bool
     {
         return $node->name instanceof Name && in_array($node->name->toString(), [
-            "mysqli_connect", "mysqli_query", "mysqli_close", "mysqli_error",
-            "mysqli_connect_error", "mysqli_fetch_assoc", "mysqli_num_rows",
-            "mysqli_fetch_array", "mysqli_fetch_row", "mysqli_fetch_all"
-        ]);
+                "mysqli_connect", "mysqli_query", "mysqli_close", "mysqli_error",
+                "mysqli_connect_error", "mysqli_fetch_assoc", "mysqli_num_rows",
+                "mysqli_fetch_array", "mysqli_fetch_row", "mysqli_fetch_all"
+            ]);
     }
 
     private function isMysqliFetchAssocLoop(While_ $whileNode): bool
