@@ -44,6 +44,13 @@ the first component is the sink's function name and the second component is the 
 If you don't exactly know the location or if there could be potentially multiple occurrences, you can just put the
 function name as array item.
 
+To reduce false-positive reports from the fuzzer's crash detection, we introduced a second variable `$ignoredCallers`, which
+can be used to provide details about the target CMS' internals. Sometimes, tainted values are propagated to annotated sinks but in
+intended scenarios. The assumption here is, that official internal functions do not suffer from typical security-relevant mistakes
+using the WordPress APIs. Examples are given in the `WordPressSinkVisitor` class. You may add function names and/or whole classes (i.e. files)
+to that list of ignored callers. Everytime, the fuzzer detects a tainted value flowing into a sink originating from any of these sources,
+the event will be ignored an no false-positive is generated.
+
 ```php
 // example sinks for WordPress
 $functions = [
@@ -64,7 +71,26 @@ $functions = [
     ["get_users", "/wp-includes/user.php"],
     ["update_user_meta", "/wp-includes/user.php"],
     ["query", "/wp-includes/class-wpdb.php"],
-    ["install", "/includes/class-plugin-upgrader.php"]
+    ["install", "/includes/class-plugin-upgrader.php"],
+    // ...
+];
+
+// example list of trusted/ignored callers
+$ignoredCallers = [
+    // function names
+    [
+        "wp_verify_nonce",
+        "check_admin_referrer",
+        "check_ajax_referrer",
+        // ...
+    ],
+
+    // file names
+    [
+        "/wp-includes/class-wp-error.php",
+        "/wp-includes/class-wp-recovery-mode-email-service.php",
+        // ...
+    ]
 ];
 ```
 
@@ -82,6 +108,10 @@ class NewSinkVisitor extends AbstractSinkVisitor
     {
         $functions = [
             // place sinks here...
+        ];
+
+        $ignoredCallers = [
+            // place trusted callers here...
         ];
 
         parent::__construct($filePath, $functions);
