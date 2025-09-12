@@ -114,7 +114,7 @@ class NewSinkVisitor extends AbstractSinkVisitor
             // place trusted callers here...
         ];
 
-        parent::__construct($filePath, $functions);
+        parent::__construct($filePath, $functions, $ignoredCallers);
     }
 }
 ```
