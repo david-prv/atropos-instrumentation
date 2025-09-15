@@ -83,10 +83,10 @@ abstract class AbstractSinkVisitor extends NodeVisitorAbstract
      * of each file's AST. For nested arrays that aren't tuples, we
      * flatten the array. For valid tuples, we standardize the file path.
      *
-     * @param $function array|string The sink function to register.
+     * @param $function mixed The sink function to register.
      * @return void
      */
-    protected function addSink(array|string $function): void
+    protected function addSink($function): void
     {
         if (is_array($function)) {
             if (count($function) > 1) {
