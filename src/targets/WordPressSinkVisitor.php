@@ -80,7 +80,7 @@ class WordPressSinkVisitor extends AbstractSinkVisitor
             // Functions
             [
                 "wp_verify_nonce",
-                "check_admin_referrer",
+                "check_admin_referer",
                 "check_ajax_referer",
                 // ...
             ],
